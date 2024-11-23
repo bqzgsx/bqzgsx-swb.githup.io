@@ -5,23 +5,42 @@ const tempDisplay = document.getElementById('tempDisplay');
 
 function updateColor(value) {
     let temp = parseInt(value);
-    temp = Math.max(1000, Math.min(12000, temp));
+    if (isNaN(temp)) return;
     
-    const color = colorTemperatureToRGB(temp);
-    display.style.backgroundColor = `rgb(${color.red}, ${color.green}, ${color.blue})`;
-    tempDisplay.textContent = `${temp}K`;
-    colorTemp.value = temp;
-    tempSlider.value = temp;
+    if (temp >= 1000 && temp <= 12000) {
+        const color = colorTemperatureToRGB(temp);
+        display.style.backgroundColor = `rgb(${color.red}, ${color.green}, ${color.blue})`;
+        tempDisplay.textContent = `${temp}K`;
+        tempSlider.value = temp;
+    }
 }
 
 colorTemp.addEventListener('input', (e) => {
-    let value = parseInt(e.target.value);
-    if (value < 1000) value = 1000;
-    if (value > 12000) value = 12000;
+    const value = e.target.value;
+    if (value === '') {
+        colorTemp.value = '';
+        tempDisplay.textContent = '0K';
+        return;
+    }
     updateColor(value);
 });
 
-tempSlider.addEventListener('input', (e) => updateColor(e.target.value));
+colorTemp.addEventListener('blur', (e) => {
+    let value = parseInt(e.target.value);
+    if (isNaN(value) || value < 1000) {
+        value = 1000;
+    } else if (value > 12000) {
+        value = 12000;
+    }
+    colorTemp.value = value;
+    updateColor(value);
+});
+
+tempSlider.addEventListener('input', (e) => {
+    const value = e.target.value;
+    colorTemp.value = value;
+    updateColor(value);
+});
 
 // 初始化显示
 updateColor(1000);
